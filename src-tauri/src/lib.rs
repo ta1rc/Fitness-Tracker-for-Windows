@@ -887,7 +887,14 @@ fn export_data(app: tauri::AppHandle, db: State<Db>, stamp: String) -> R<String>
 fn reveal_path(path: String) -> R<()> {
     #[cfg(target_os = "macos")]
     std::process::Command::new("open").arg("-R").arg(&path).spawn().map_err(err)?;
-    let _ = path;
+    // Explorer wants "/select," and the path as one argument.
+    #[cfg(target_os = "windows")]
+    std::process::Command::new("explorer").arg(format!("/select,{path}")).spawn().map_err(err)?;
+    #[cfg(target_os = "linux")]
+    {
+        let dir = std::path::Path::new(&path).parent().map(|d| d.to_path_buf()).unwrap_or_default();
+        std::process::Command::new("xdg-open").arg(dir).spawn().map_err(err)?;
+    }
     Ok(())
 }
 

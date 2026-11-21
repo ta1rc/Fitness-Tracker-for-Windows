@@ -192,3 +192,30 @@ npm install
 
 - **History is immutable.** Diary entries copy per-serving values when you log them, so editing a food later doesn't rewrite past days.
 - **Trend over noise.** Weight is shown as an exponential moving average (α = 0.1). The weekly rate is a least-squares fit over the last 28 days of that trend.
+
+## Windows
+
+Tally runs on Windows too: Tauri, Rust and the bundled SQLite are all cross-platform. On Windows the data lives in `%APPDATA%\app.tally.desktop\tally.db`.
+
+**Download:** grab `Tally_<version>_x64-setup.exe` from the [Releases](../../releases) page and run it. The installer isn't code-signed, so Windows SmartScreen asks once: **More info → Run anyway**. If WebView2 is missing (it ships with Windows 10 and 11), the installer fetches it.
+
+**Build it yourself on a Mac.** This uses Tauri's cross-compilation, which is experimental and makes an NSIS `.exe` only. Set up once:
+
+```bash
+brew install makensis llvm lld
+rustup target add x86_64-pc-windows-msvc
+cargo install --locked cargo-xwin
+```
+
+Then build. The `LANG`/`LC_ALL` line matters: NSIS crashes on macOS when no UTF-8 locale is set, and LLVM's tools need to be on the `PATH`:
+
+```bash
+export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 PATH="$(brew --prefix llvm)/bin:$PATH"
+npm run tauri build -- --runner cargo-xwin --target x86_64-pc-windows-msvc
+```
+
+The installer lands in `src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/`. It needs nothing beyond Windows 10 or 11: no Visual C++ redistributable. On the first run, `cargo-xwin` downloads Microsoft's Windows SDK and CRT files.
+
+**Or on a Windows PC:** install Node 18+, Rust and the Visual Studio Build Tools ("Desktop development with C++"), then run `npm install` and `npm run tauri build`.
+
+On Windows, shortcuts use Ctrl wherever this README says ⌘.

@@ -29,6 +29,8 @@ const NAV: { id: View; label: string; dated?: boolean }[] = [
   { id: "goals", label: "Settings" },
 ];
 
+const isMac = navigator.userAgent.includes("Mac");
+
 const SCENE_ORDER: (SceneId | "auto")[] = ["auto", ...SCENES.map((s) => s.id)];
 
 const typing = (e: KeyboardEvent) => {
@@ -157,7 +159,8 @@ function Rail() {
 
   return (
     <aside className="flex w-[228px] shrink-0 flex-col pl-6 pr-4">
-      <div data-tauri-drag-region className="h-[58px] shrink-0" />
+      {/* Room for the macOS window buttons; Windows and Linux have a regular title bar. */}
+      <div data-tauri-drag-region className={`${isMac ? "h-[58px]" : "h-5"} shrink-0`} />
       <div data-tauri-drag-region className="flex items-center gap-2.5 pb-9 pt-1">
         <Logo />
         <span className="title text-[17px]">Tally</span>
